@@ -1,4 +1,3 @@
-
 use std::str::FromStr;
 use thiserror::Error;
 
@@ -131,9 +130,12 @@ pub fn parse_cli_args(args: &[String]) -> Result<CliCommand, BitcoinError> {
     match args[0].as_str() {
         "send" => {
             if args.len() < 3 {
-                return Err(BitcoinError::ParseError("Send command requires amount and address".to_string()));
+                return Err(BitcoinError::ParseError(
+                    "Send command requires amount and address".to_string(),
+                ));
             }
-            let amount = args[1].parse::<u64>()
+            let amount = args[1]
+                .parse::<u64>()
                 .map_err(|_| BitcoinError::ParseError("Invalid amount".to_string()))?;
             let address = args[2].clone();
             Ok(CliCommand::Send { amount, address })
@@ -186,13 +188,13 @@ impl TryFrom<&[u8]> for LegacyTransaction {
 impl BitcoinSerialize for LegacyTransaction {
     fn serialize(&self) -> Vec<u8> {
         let mut result = Vec::new();
-        
+
         // Serialize version (4 bytes)
         result.extend_from_slice(&self.version.to_le_bytes());
-        
+
         // Serialize lock_time (4 bytes)
         result.extend_from_slice(&self.lock_time.to_le_bytes());
-        
+
         result
     }
 }
